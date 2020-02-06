@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ server.name or 'TS3 Server' }}</title>
+    <style>
+        body {
+            font-family: "Helvetica", "Arial", sans-serif;
+            margin: 1em;
+        }
+
+        .list {
+            max-width: 24em;
+        }
+
+        .list-channel {
+            margin: 0 0 1em 2em;
+        }
+
+        .list-channel-name {
+            font-weight: bold;
+            width: auto;
+        }
+
+        .list-client-name {
+            font-weight: normal;
+            margin-left: 2em;
+        }
+    </style>
+</head>
+<body>
+{% block body %}
+{% endblock %}
+</body>
+</html>

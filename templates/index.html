@@ -1,0 +1,27 @@
+{% extends '__layout.html' %}
+
+{% macro channel(c) %}
+    <div class="list-channel">
+        <p class="list-channel-name">> {{ c.name }}</p>
+
+        {% for sc in c.subchannels %}
+            {{ channel(sc) }}
+        {% endfor %}
+
+        {% for cl in c.clients %}
+            <div class="list-client-name">{{ cl.name }}</div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% block body %}
+    <h2>{{ server.name }}</h2>
+
+    <div class="list">
+        {% for ch in server.channels %}
+            {{ channel(ch) }}
+        {% endfor %}
+    </div>
+    <br>
+    <div>Fetch time: {{ fetch_time }}</div>
+{% endblock %}
