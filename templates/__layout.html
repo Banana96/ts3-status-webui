@@ -2,34 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ server.name or 'TS3 Server' }}</title>
+    <title>{{ server.name }}</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu"
+        crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
+        integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ"
+        crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script
+        src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+        integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+        crossorigin="anonymous">
+    </script>
+
     <style>
-        body {
-            font-family: "Helvetica", "Arial", sans-serif;
-            margin: 1em;
+        .list-group.list-group-root {
+            padding: 0;
+            overflow: hidden;
         }
 
-        .list {
-            max-width: 24em;
+        .list-group.list-group-root .list-group {
+            margin-bottom: 0;
         }
 
-        .list-channel {
-            margin: 0 0 1em 2em;
+        .list-group.list-group-root .list-group-item {
+            border-radius: 0;
+            border-width: 1px 0 0 0;
         }
 
-        .list-channel-name {
-            font-weight: bold;
-            width: auto;
+        .list-group.list-group-root > .list-group-item:first-child {
+            border-top-width: 0;
         }
 
-        .list-client-name {
-            font-weight: normal;
-            margin-left: 2em;
+        .list-group.list-group-root > .list-group > .list-group-item {
+            padding-left: 30px;
+        }
+
+        .list-group.list-group-root > .list-group > .list-group > .list-group-item {
+            padding-left: 50px;
         }
     </style>
 </head>
 <body>
-{% block body %}
-{% endblock %}
+    <div class="container-fluid">
+        <div class="page-header">
+            <h1>{{ server.name }}</h1>
+        </div>
+
+        {% block body %}
+        {% endblock %}
+    </div>
 </body>
 </html>

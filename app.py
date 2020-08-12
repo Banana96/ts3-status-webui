@@ -1,88 +1,43 @@
 from datetime import datetime, timedelta
 from os import environ as env
 from flask import *
-from ts3.query import TS3Connection
+from ts3.query import TS3ServerConnection
 
-
-def get_ts3_connection():
-    conn = TS3Connection(
-        host=env.get("TS3_HOSTNAME", "localhost"),
-        port=env.get("TS3_PORT", 10011)
-    )
-
-    conn.login(
-        client_login_name=env.get("TS3_USER", "serveradmin"),
-        client_login_password=env.get("TS3_PASSWORD", "")
-    )
-
-    conn.use(sid=env.get("TS3_SID", 1))
-
-    return conn
-
-
-def get_client_dict(clid, clients):
-    client = [cl for cl in clients if cl["clid"] == clid]
-
-    if len(client) == 0:
-        return {}
-
-    client = client[0]
-
-    return {"name": client["client_nickname"]}
-
-
-def get_channel_dict(cid, channels, clients):
-    channel = [c for c in channels if c["cid"] == cid]
-
-    if len(channel) == 0:
-        return {}
-
-    channel = channel[0]
-
-    sub_cids = [c["cid"] for c in channels if c["pid"] == cid]
-
-    channel_data = {
-        "name": channel["channel_name"],
-        "subchannels": [get_channel_dict(sub_cid, channels, clients) for sub_cid in sub_cids],
-        "clients": [get_client_dict(cl["clid"], clients) for cl in clients if cl["cid"] == cid]
-    }
-
-    if len(channel_data["clients"]) == 0:
-        channel_data.pop("clients")
-
-    if len(channel_data["subchannels"]) == 0:
-        channel_data.pop("subchannels")
-
-    return channel_data
-
+from ts_client import QueryClient
 
 app = Flask(__name__)
 fetch_time = datetime(1970, 1, 1)
 conn_data = {}
 
 
+def get_ts3_connection():
+    ssh = env.get("TS3_USE_SSH", "false").lower() in ("true", "1", "yes")
+    user = env.get("TS3_USER", "serveradmin")
+    pwd = env.get("TS3_PASSWORD", "")
+    host = env.get("TS3_HOSTNAME", "localhost")
+    port = env.get("TS3_PORT", "10011")
+    sid = env.get("TS3_SID", "1")
+
+    conn_str = f"{'ssh' if ssh else 'telnet'}://{user}:{pwd}@{host}:{port}"
+
+    conn = TS3ServerConnection(conn_str)
+    conn.exec_("use", sid=sid)
+
+    return conn
+
+
 @app.route("/")
 def index():
     global fetch_time, conn_data
 
-    if datetime.now() - fetch_time >= timedelta(seconds=10):
+    if datetime.now() - fetch_time >= timedelta(seconds=1):
         with get_ts3_connection() as conn:
-            self_clid = conn.whoami().parsed[0]["client_id"]
-            svinfo = conn.serverinfo().parsed[0]
-            channels = conn.channellist().parsed
-            clients = (c for c in conn.clientlist().parsed if c['clid'] != self_clid)
+            qc = QueryClient(conn)
 
             fetch_time = datetime.now()
 
-            root_cids = [c["cid"] for c in channels if c["pid"] == "0"]
-
             conn_data = {
-                "server": {
-                    "name": svinfo["virtualserver_name"],
-                    "platform": svinfo["virtualserver_platform"],
-                    "version": svinfo["virtualserver_version"],
-                    "channels": [get_channel_dict(cid, channels, clients) for cid in root_cids],
-                },
+                "server": qc.render(),
                 "fetch_time": fetch_time.strftime("%Y-%d-%m %H:%M:%S")
             }
 
