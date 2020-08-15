@@ -1,0 +1,69 @@
+{% extends '__layout.html' %}
+
+{% block body %}
+    <div class="row">
+        <!------------------------------------------------- ACTIVE CHANNELS -->
+        <div class="col-md-3">
+            <h3>Active channels</h3>
+
+            {% macro client(cl) %}
+                {% if cl.type != 0 %}
+                    <i class="glyphicon glyphicon-eye-close"></i>
+                {% elif cl.afk %}
+                    <i class="glyphicon glyphicon-volume-off"></i>
+                {% else %}
+                    <i class="glyphicon glyphicon-user"></i>
+                {% endif %}
+                &nbsp;{{ cl.name }}
+            {% endmacro %}
+
+            {% macro channel(c) %}
+                <a class="list-group-item">
+                    <i class="glyphicon glyphicon-chevron-right"></i>&nbsp;
+                    <strong>{{ c.name }}</strong>
+                </a>
+
+                <div class="list-group" id="channel-{{ c.id }}">
+                    {% for sc in c.subchannels %}
+                        <div class="list-group-item">{{ channel(sc) }}</div>
+                    {% endfor %}
+
+                    {% for cl in c.clients %}
+                        <div class="list-group-item" style="padding-left: 32px;">
+                            {{ client(cl) }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endmacro %}
+
+            {% if server.channels %}
+                <div class="list-group list-group-root well">
+                    {% for ch in server.channels %}
+                        {{ channel(ch) }}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <strong>No users connected</strong>
+            {% endif %}
+        </div>
+
+        <!---------------------------------------------------- RECENT USERS -->
+        <div class="col-md-3">
+            <h3>Recent users</h3>
+            <div class="list-group list-group-root well">
+                {% for db_cl in server.last_clients %}
+                    <div class="list-group-item">
+                        <strong>{{ db_cl.name }}</strong>
+                        {% if db_cl.online_time %}
+                            Online for: {{ db_cl.online_time | td2str }}
+                        {% else %}
+                            Last seen: {{ db_cl.last_visit | diff2str }} ago
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div>State fetched: {{ fetch_time }}</div>
+{% endblock %}
