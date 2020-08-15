@@ -7,6 +7,9 @@ from .utils import format_td, format_diff
 
 app = Flask(__name__)
 
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
+
 app.add_template_filter(format_td, "td2str")
 app.add_template_filter(format_diff, "diff2str")
 
