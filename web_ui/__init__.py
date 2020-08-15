@@ -10,26 +10,28 @@ app = Flask(__name__)
 app.add_template_filter(format_td, "td2str")
 app.add_template_filter(format_diff, "diff2str")
 
+fetch_time = datetime(1970, 1, 1)
+server_state = {}
+
 
 @app.route("/")
 def index():
-    if "fetch_time" not in g:
-        g.fetch_time = datetime(1970, 1, 1)
+    global fetch_time, server_state
 
-    if datetime.now() - g.fetch_time >= timedelta(seconds=5):
+    if datetime.now() - fetch_time >= timedelta(seconds=5):
+        fetch_time = datetime.now()
+
         with get_query() as qc:
-            g.fetch_time = datetime.now()
-
-            g.server_state = {
+            server_state = {
                 "server": qc.render(),
-                "fetch_time": g.fetch_time.strftime("%Y-%d-%m %H:%M:%S")
+                "fetch_time": fetch_time.strftime("%Y-%d-%m %H:%M:%S")
             }
 
     if request.args.get("format", "") == "json":
-        return jsonify(g.server_state)
+        return jsonify(server_state)
 
     return render_template("index.html", **{
-        **g.server_state,
+        **server_state,
         "ts3_addr": env.get("TS3_HOSTNAME", "localhost")
     })
 
