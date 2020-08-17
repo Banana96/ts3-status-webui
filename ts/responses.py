@@ -104,11 +104,11 @@ class Channel(ParsedResponse):
         cls = [cl for cl in clients if cl.channel_id == self.channel_id]
 
         ch_render = [sub.render(channels, clients) for sub in subs]
-        ch_render = [ch for ch in ch_render if ch.get("rm_mark", False) is False]
+        ch_render = [ch for ch in ch_render if ch.get("empty") is False]
 
         cl_render = [cl.render() for cl in cls]
 
-        rm_mark = len(ch_render) == 0 and len(cl_render) == 0
+        empty = len(ch_render) == 0 and len(cl_render) == 0
 
         return {
             "id": self.channel_id,
@@ -116,7 +116,7 @@ class Channel(ParsedResponse):
             "name": self.name,
             "subchannels": ch_render,
             "clients": cl_render,
-            "rm_mark": rm_mark
+            "empty": empty
         }
 
     def __str__(self):
@@ -151,18 +151,20 @@ class ServerInfo(ParsedResponse):
                 online_time = dt_now - db_cl.last_visit
 
             recent_clients.append({
-                "name": db_cl.name,
-                "last_visit": db_cl.last_visit,
+                **db_cl.render(),
                 "online_time": online_time,
             })
 
-        return recent_clients
+        return sorted(
+            recent_clients,
+            key=lambda cl: cl["online_time"] is None
+        )
 
     def render(self, channels, clients, db_clients) -> dict:
         root_chs = [ch for ch in channels if ch.parent_ch_id == 0]
 
         ch_render = [ch.render(channels, clients) for ch in root_chs]
-        ch_render = [ch for ch in ch_render if ch["rm_mark"] is False]
+        ch_render = [ch for ch in ch_render if ch["empty"] is False]
 
         last_clients = self._render_recent_clients(clients, db_clients)
 

@@ -1,6 +1,7 @@
-from os import environ as env
 from datetime import datetime, timedelta
-from flask import Flask, request, g, jsonify, render_template
+from os import environ as env
+
+from flask import Flask, request, jsonify, render_template
 
 from ts.query import get_query
 from .utils import format_td, format_diff
