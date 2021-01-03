@@ -1,0 +1,65 @@
+.recent-status {
+    text-align: right;
+}
+
+/* Server styles */
+
+.server {
+    padding-left: 1.5em;
+    background-image: url("img/server.svg");
+    background-repeat: no-repeat;
+    text-decoration: none;
+}
+
+/* Channel styles */
+
+.channel {
+    padding-left: 2em;
+    background-image: url("img/channel.svg");
+    background-repeat: no-repeat;
+    display: block;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.channel.default {
+    background-image: url("img/channel_default.svg") !important;
+}
+
+/* Client styles */
+
+.client-wrapper {
+    margin-left: 2em;
+}
+
+.client {
+    padding-left: 2em;
+    background-image: url("img/client_idle.svg");
+    background-repeat: no-repeat;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.client.talking {
+    background-image: url("img/client_talking.svg") !important;
+}
+
+.client.input-muted {
+    background-image: url("img/client_input_muted.svg") !important;
+}
+
+.client.output-muted {
+    background-image: url("img/client_output_muted.svg") !important;
+}
+
+.client.input-disabled {
+    background-image: url("img/client_input_disabled.svg") !important;
+}
+
+.client.output-disabled {
+    background-image: url("img/client_output_disabled.svg") !important;
+}
