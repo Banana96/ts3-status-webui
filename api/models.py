@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from django.conf import settings
+
 
 class ParsedResponse:
     def __init__(self, content=None):
@@ -43,12 +45,28 @@ class Client(ParsedResponse):
         return self.get_int("client_type")
 
     @property
-    def afk(self) -> bool:
-        in_mute = self.get_int("client_input_muted")
-        out_mute = self.get_int("client_output_muted")
-        away = self.get_int("client_away")
+    def has_input_disabled(self) -> bool:
+        return self.get_bool("client_input_muted")
 
-        return in_mute + out_mute + away > 0
+    @property
+    def has_output_disabled(self):
+        return self.get_bool("client_output_muted")
+
+    @property
+    def has_input_muted(self) -> bool:
+        return self.get_bool("client_input_muted")
+
+    @property
+    def has_output_muted(self):
+        return self.get_bool("client_output_muted")
+
+    @property
+    def is_away(self):
+        return self.get_bool("client_away")
+
+    @property
+    def is_talking(self) -> bool:
+        return self.get_bool("client_flag_talking")
 
     def render(self) -> dict:
         return {
@@ -56,7 +74,10 @@ class Client(ParsedResponse):
             "db_id": self.db_id,
             "name": self.name,
             "type": self.client_type,
-            "afk": self.afk,
+            "input_muted": self.has_input_muted,
+            "output_muted": self.has_output_muted,
+            "talking": self.is_talking,
+            "away": self.is_away,
         }
 
     def __str__(self):
@@ -71,7 +92,7 @@ class DatabaseClient(Client):
     @property
     def first_visit(self) -> datetime:
         return self.get_datetime("client_created")
-    
+
     @property
     def last_visit(self) -> datetime:
         return self.get_datetime("client_lastconnected")
@@ -99,24 +120,20 @@ class Channel(ParsedResponse):
     def name(self) -> str:
         return self.get_str("channel_name")
 
-    def render(self, channels, clients) -> dict:
-        subs = [sub for sub in channels if sub.parent_ch_id == self.channel_id]
+    @property
+    def is_default(self) -> bool:
+        return self.get_bool("channel_flag_default")
+
+    def render(self, clients) -> dict:
         cls = [cl for cl in clients if cl.channel_id == self.channel_id]
-
-        ch_render = [sub.render(channels, clients) for sub in subs]
-        ch_render = [ch for ch in ch_render if ch.get("empty") is False]
-
         cl_render = [cl.render() for cl in cls]
-
-        empty = len(ch_render) == 0 and len(cl_render) == 0
 
         return {
             "id": self.channel_id,
             "parent_id": self.parent_ch_id,
             "name": self.name,
-            "subchannels": ch_render,
             "clients": cl_render,
-            "empty": empty
+            "is_default": self.is_default,
         }
 
     def __str__(self):
@@ -144,7 +161,7 @@ class ServerInfo(ParsedResponse):
         recent_clients = []
         dt_now = datetime.now()
 
-        for db_cl in sorted_db_clients[:10]:
+        for db_cl in sorted_db_clients[:settings.TS3_TOPLIST_LEN]:
             online_time = None
 
             if db_cl.db_id in online_db_ids:
@@ -161,17 +178,10 @@ class ServerInfo(ParsedResponse):
         )
 
     def render(self, channels, clients, db_clients) -> dict:
-        root_chs = [ch for ch in channels if ch.parent_ch_id == 0]
-
-        ch_render = [ch.render(channels, clients) for ch in root_chs]
-        ch_render = [ch for ch in ch_render if ch["empty"] is False]
-
-        last_clients = self._render_recent_clients(clients, db_clients)
-
         return {
             "name": self.name,
-            "channels": ch_render,
-            "last_clients": last_clients
+            "channels": [ch.render(clients) for ch in channels],
+            "last_clients": self._render_recent_clients(clients, db_clients)
         }
 
     def __str__(self):
