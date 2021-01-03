@@ -50,6 +50,4 @@ def client_style_cls(client) -> str:
 
 @register.filter(name="channel_style_cls")
 def channel_style_cls(channel):
-
-
     return ""

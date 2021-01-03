@@ -76,6 +76,7 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
+STATIC_ROOT = str(BASE_DIR / "static")
 
 TS3_URL = env("TS3_URL")
 TS3_PUBLIC_ADDR = env("TS3_PUBLIC_ADDR")
