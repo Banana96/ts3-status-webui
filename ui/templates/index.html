@@ -31,18 +31,22 @@
             {% if server.channels %}
                 <ul class="list-group">
                     {% for channel in server.channels %}
-                        <li class="list-group-item">
-                            <span class="channel{% if channel.is_default %} default{% endif %}">
-                                {{ channel.name }}
-                            </span>
-                        </li>
-                        {% for client in channel.clients %}
+                        {% if channel.clients %}
                             <li class="list-group-item">
-                                <div class="client-wrapper">
-                                    <span class="client {{ client | client_style_cls }}">{{ client.name }}</span>
-                                </div>
+                                <span class="channel{% if channel.is_default %} default{% endif %}">
+                                    {{ channel.name }}
+                                </span>
                             </li>
-                        {% endfor %}
+                            {% for client in channel.clients %}
+                                <li class="list-group-item">
+                                    <div class="client-wrapper">
+                                        <span class="client {{ client | client_style_cls }}">
+                                            {{ client.name }}
+                                        </span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
                     {% endfor %}
                 </ul>
             {% endif %}
