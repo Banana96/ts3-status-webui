@@ -1,7 +1,3 @@
-.recent-status {
-    text-align: right;
-}
-
 /* Server styles */
 
 .server {
@@ -9,6 +5,7 @@
     background-image: url("img/server.svg");
     background-repeat: no-repeat;
     text-decoration: none;
+    color: #212529;
 }
 
 /* Channel styles */
@@ -62,4 +59,15 @@
 
 .client.output-disabled {
     background-image: url("img/client_output_disabled.svg") !important;
+}
+
+/* Recent clients styles */
+
+.recent.online {
+    color: #007740;
+    font-weight: bold;
+}
+
+.recent.offline {
+    color: #8f8f8f;
 }

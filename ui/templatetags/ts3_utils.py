@@ -9,24 +9,24 @@ def format_td(d: timedelta) -> str:
     t = int(d.total_seconds())
 
     if t < 60:
-        return f"{t} seconds"
+        return f"{t} s"
 
     t //= 60
 
     if t < 60:
-        return f"{t} minutes"
+        return f"{t} m"
 
     t //= 60
 
     if t < 24:
-        return f"{t} hours"
+        return f"{t} h"
 
     t //= 24
 
     if t < 365:
-        return f"{t} days"
+        return f"{t} d"
 
-    return "over a year"
+    return ">1 y"
 
 
 @register.filter(name="diff2str")
